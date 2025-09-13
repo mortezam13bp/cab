@@ -1,0 +1,50 @@
+wallCSection = document.getElementById('wallCSection');
+
+layout.addEventListener('change', () => {
+  wallCSection.classList.toggle('hidden', layout.value !== 'U شکل');
+});
+
+function handleCustom(selectId, inputId) {
+  const select = document.getElementById(selectId);
+  const input = document.getElementById(inputId);
+  select.addEventListener('change', () => {
+    input.classList.toggle('hidden', select.value !== 'custom');
+  });
+}
+
+handleCustom('fridgeSelect', 'fridgeCustom');
+handleCustom('sinkSelect', 'sinkCustom');
+handleCustom('dishSelect', 'dishCustom');
+handleCustom('washerSelect', 'washerCustom');
+handleCustom('ovenSelect', 'ovenCustom');
+
+document.getElementById('cabinetForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+
+  const fridge = data.fridgePosition === 'custom' ? data.fridgeCustom : data.fridgePosition;
+  const sink = data.sinkPosition === 'custom' ? data.sinkCustom : data.sinkPosition;
+  const dish = data.dishwasherPosition === 'custom' ? data.dishCustom : data.dishwasherPosition;
+  const washer = data.washerPosition === 'custom' ? data.washerCustom : data.washerPosition;
+  const oven = data.ovenPosition === 'custom' ? data.ovenCustom : data.ovenPosition;
+
+  const wallCText = data.wallC ? Wall C length: ${data.wallC} cm\n : '';
+
+  const prompt = `Design a modular kitchen cabinetry system with a ${data.layout} layout.
+Wall A length: ${data.wallA} cm
+Wall B length: ${data.wallB} cm, positioned to the ${data.wallBPosition} of Wall A
+${wallCText}Ceiling height: ${data.ceilingHeight} cm
+Cabinet color: ${data.cabinetColor}, finish: ${data.finish}
+
+Appliance Placement:
+- Fridge: ${fridge}
+- Sink: ${sink}
+- Dishwasher: ${dish}
+- Washing Machine: ${washer}
+- Oven/Microwave: ${oven}
+
+Use high-gloss polyglass panels with push-to-open mechanisms.
+Construct carcass from moisture-resistant MDF with PVC edge banding.
+Ensure clean alignment and functional zoning.`;
+
+  document.getElementById
