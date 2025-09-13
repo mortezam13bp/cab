@@ -1,4 +1,118 @@
-wallCSection = document.getElementById('wallCSection');
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>فرم پویا طراحی کابینت آشپزخانه</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; background: #f2f2f2; padding: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; background: #0078d4; color: white; border: none; cursor: pointer; }
+    #output { margin-top: 30px; background: #fff; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>فرم پویا طراحی کابینت آشپزخانه</h2>
+
+<form id="cabinetForm">
+  <label>نوع چیدمان:</label>
+  <select name="layout" id="layout">
+    <option value="خطی">خطی</option>
+    <option value="L شکل">L شکل</option>
+    <option value="U شکل">U شکل</option>
+    <option value="جزیره‌دار">جزیره‌دار</option>
+  </select>
+
+  <label>طول دیوار A (سانتی‌متر):</label>
+  <input type="number" name="wallA">
+
+  <label>طول دیوار B (سانتی‌متر):</label>
+  <input type="number" name="wallB">
+
+  <label>موقعیت دیوار B نسبت به A:</label>
+  <select name="wallBPosition">
+    <option value="سمت چپ">سمت چپ</option>
+    <option value="سمت راست">سمت راست</option>
+    <option value="روبرو">روبرو</option>
+  </select>
+
+  <div id="wallCSection" class="hidden">
+    <label>طول دیوار C (سانتی‌متر):</label>
+    <input type="number" name="wallC">
+  </div>
+
+  <label>ارتفاع سقف (سانتی‌متر):</label>
+  <input type="number" name="ceilingHeight">
+
+  <label>رنگ کابینت:</label>
+  <input type="text" name="cabinetColor">
+
+  <label>نوع فینیش:</label>
+  <select name="finish">
+    <option value="مات">مات</option>
+    <option value="براق">براق</option>
+    <option value="چوبی">چوبی</option>
+    <option value="ترکیبی">ترکیبی</option>
+  </select>
+
+  <hr>
+  <h3>محل قرارگیری وسایل اصلی آشپزخانه</h3>
+
+  <label>یخچال:</label>
+  <select name="fridgePosition" id="fridgeSelect">
+    <option value="سمت چپ دیوار A">سمت چپ دیوار A</option>
+    <option value="سمت راست دیوار A">سمت راست دیوار A</option>
+    <option value="وسط دیوار B">وسط دیوار B</option>
+    <option value="custom">سفارشی...</option>
+  </select>
+  <input type="text" name="fridgeCustom" id="fridgeCustom" class="hidden" placeholder="محل دلخواه یخچال">
+
+  <label>سینک ظرف‌شویی:</label>
+  <select name="sinkPosition" id="sinkSelect">
+    <option value="وسط دیوار A">وسط دیوار A</option>
+    <option value="نزدیک پنجره">نزدیک پنجره</option>
+    <option value="گوشه دیوار B">گوشه دیوار B</option>
+    <option value="custom">سفارشی...</option>
+  </select>
+  <input type="text" name="sinkCustom" id="sinkCustom" class="hidden" placeholder="محل دلخواه سینک">
+
+  <label>ماشین ظرفشویی:</label>
+  <select name="dishwasherPosition" id="dishSelect">
+    <option value="کنار سینک">کنار سینک</option>
+    <option value="زیر سینک">زیر سینک</option>
+    <option value="سمت راست دیوار A">سمت راست دیوار A</option>
+    <option value="custom">سفارشی...</option>
+  </select>
+  <input type="text" name="dishCustom" id="dishCustom" class="hidden" placeholder="محل دلخواه ظرفشویی">
+
+  <label>ماشین لباسشویی:</label>
+  <select name="washerPosition" id="washerSelect">
+    <option value="گوشه دیوار B">گوشه دیوار B</option>
+    <option value="سمت چپ دیوار A">سمت چپ دیوار A</option>
+    <option value="داخل یونیت Tall">داخل یونیت Tall</option>
+    <option value="custom">سفارشی...</option>
+  </select>
+  <input type="text" name="washerCustom" id="washerCustom" class="hidden" placeholder="محل دلخواه لباسشویی">
+
+  <label>فر و مایکروفر:</label>
+  <select name="ovenPosition" id="ovenSelect">
+    <option value="زیر اجاق گاز">زیر اجاق گاز</option>
+    <option value="داخل یونیت بلند">داخل یونیت بلند</option>
+    <option value="روی جزیره">روی جزیره</option>
+    <option value="custom">سفارشی...</option>
+  </select>
+  <input type="text" name="ovenCustom" id="ovenCustom" class="hidden" placeholder="محل دلخواه فر و مایکروفر">
+
+  <button type="submit">تولید پرامپت طراحی</button>
+</form>
+
+<div id="output"></div>
+
+<script>
+const layout = document.getElementById('layout');
+const wallCSection = document.getElementById('wallCSection');
 
 layout.addEventListener('change', () => {
   wallCSection.classList.toggle('hidden', layout.value !== 'U شکل');
@@ -28,7 +142,7 @@ document.getElementById('cabinetForm').addEventListener('submit', function(e) {
   const washer = data.washerPosition === 'custom' ? data.washerCustom : data.washerPosition;
   const oven = data.ovenPosition === 'custom' ? data.ovenCustom : data.ovenPosition;
 
-  const wallCText = data.wallC ? Wall C length: ${data.wallC} cm\n : '';
+  const wallCText = data.wallC ? `Wall C length: ${data.wallC} cm\n` : '';
 
   const prompt = `Design a modular kitchen cabinetry system with a ${data.layout} layout.
 Wall A length: ${data.wallA} cm
@@ -47,4 +161,9 @@ Use high-gloss polyglass panels with push-to-open mechanisms.
 Construct carcass from moisture-resistant MDF with PVC edge banding.
 Ensure clean alignment and functional zoning.`;
 
-  document.getElementById
+  document.getElementById('output').textContent = prompt;
+});
+</script>
+
+</body>
+</html
