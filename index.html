@@ -1,166 +1,186 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>فرم کامل طراحی کابینت آشپزخانه</title>
-  <style>
-    body { font-family: sans-serif; direction: rtl; background: #f2f2f2; padding: 20px; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 20px; padding: 10px 20px; background: #0078d4; color: white; border: none; cursor: pointer; }
-    #output { margin-top: 30px; background: #fff; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; }
-    .hidden { display: none; }
-  </style>
+<meta charset="UTF-8">
+<title>ویرایش تعاملی 3D کابینت</title>
+<style>
+  body { margin:0; overflow:hidden; font-family:sans-serif; direction:rtl; }
+  #gui { position:absolute; top:10px; right:10px; background:#fff; padding:10px; border-radius:5px; z-index:1; width:300px; }
+  label { display:block; margin:3px 0; }
+  input, select { width:100%; }
+  textarea { width:100%; height:120px; margin-top:5px; font-family: monospace; }
+</style>
 </head>
 <body>
 
-<h2>فرم کامل طراحی کابینت آشپزخانه</h2>
-
-<form id="cabinetForm">
-  <label>نوع چیدمان:</label>
-  <select name="layout" id="layout">
-    <option value="خطی">خطی</option>
-    <option value="L شکل">L شکل</option>
-    <option value="U شکل">U شکل</option>
-    <option value="جزیره‌دار">جزیره‌دار</option>
-  </select>
-
-  <label>طول دیوار A (سانتی‌متر):</label>
-  <input type="number" name="wallA">
-
-  <label>طول دیوار B (سانتی‌متر):</label>
-  <input type="number" name="wallB">
-
-  <label>موقعیت دیوار B نسبت به A:</label>
-  <select name="wallBPosition">
-    <option value="سمت چپ">سمت چپ</option>
-    <option value="سمت راست">سمت راست</option>
-    <option value="روبرو">روبرو</option>
-  </select>
-
-  <div id="wallCSection" class="hidden">
-    <label>طول دیوار C (سانتی‌متر):</label>
-    <input type="number" name="wallC">
-  </div>
-
-  <label>ارتفاع سقف (سانتی‌متر):</label>
-  <input type="number" name="ceilingHeight">
-
-  <label>رنگ کابینت:</label>
-  <input type="text" name="cabinetColor">
-
-  <label>نوع فینیش:</label>
-  <select name="finish">
-    <option value="مات">مات</option>
-    <option value="براق">براق</option>
-    <option value="چوبی">چوبی</option>
-    <option value="ترکیبی">ترکیبی</option>
-  </select>
-
+<div id="gui">
+  <button onclick="addWall()">➕ دیوار</button>
   <hr>
-  <h3>محل قرارگیری وسایل اصلی آشپزخانه</h3>
-
-  <label>یخچال:</label>
-  <select name="fridgePosition" id="fridgeSelect">
-    <option value="سمت چپ دیوار A">سمت چپ دیوار A</option>
-    <option value="سمت راست دیوار A">سمت راست دیوار A</option>
-    <option value="وسط دیوار B">وسط دیوار B</option>
-    <option value="custom">سفارشی...</option>
-  </select>
-  <input type="text" name="fridgeCustom" id="fridgeCustom" class="hidden" placeholder="محل دلخواه یخچال">
-
-  <label>سینک ظرف‌شویی:</label>
-  <select name="sinkPosition" id="sinkSelect">
-    <option value="وسط دیوار A">وسط دیوار A</option>
-    <option value="نزدیک پنجره">نزدیک پنجره</option>
-    <option value="گوشه دیوار B">گوشه دیوار B</option>
-    <option value="custom">سفارشی...</option>
-  </select>
-  <input type="text" name="sinkCustom" id="sinkCustom" class="hidden" placeholder="محل دلخواه سینک">
-
-  <label>ماشین ظرفشویی:</label>
-  <select name="dishwasherPosition" id="dishSelect">
-    <option value="کنار سینک">کنار سینک</option>
-    <option value="زیر سینک">زیر سینک</option>
-    <option value="سمت راست دیوار A">سمت راست دیوار A</option>
-    <option value="custom">سفارشی...</option>
-  </select>
-  <input type="text" name="dishCustom" id="dishCustom" class="hidden" placeholder="محل دلخواه ظرفشویی">
-
-  <label>ماشین لباسشویی:</label>
-  <select name="washerPosition" id="washerSelect">
-    <option value="گوشه دیوار B">گوشه دیوار B</option>
-    <option value="سمت چپ دیوار A">سمت چپ دیوار A</option>
-    <option value="داخل یونیت Tall">داخل یونیت Tall</option>
-    <option value="custom">سفارشی...</option>
-  </select>
-  <input type="text" name="washerCustom" id="washerCustom" class="hidden" placeholder="محل دلخواه لباسشویی">
-
-  <label>فر و مایکروفر:</label>
-  <select name="ovenPosition" id="ovenSelect">
-    <option value="زیر اجاق گاز">زیر اجاق گاز</option>
-    <option value="داخل یونیت بلند">داخل یونیت بلند</option>
-    <option value="روی جزیره">روی جزیره</option>
-    <option value="custom">سفارشی...</option>
-  </select>
-  <input type="text" name="ovenCustom" id="ovenCustom" class="hidden" placeholder="محل دلخواه فر و مایکروفر">
-
+  <label>دیوار انتخابی:</label>
+  <select id="wallSelect"></select>
+  <button onclick="addUnit()">➕ یونیت</button>
+  <button onclick="addAppliance()">➕ وسیله</button>
   <hr>
-  <h3>ویژگی‌های معماری دیوارها</h3>
-  <div id="architecturalElements"></div>
-  <button type="button" onclick="addElement()">افزودن عنصر جدید</button>
+  <label>Offset (m):</label>
+  <input type="number" id="offsetInput" step="0.1" value="0">
+  <label>Height (m):</label>
+  <input type="number" id="heightInput" step="0.1" value="0">
+  <button onclick="updatePosition()">بروزرسانی موقعیت</button>
+  <hr>
+  <textarea id="output" readonly></textarea>
+</div>
 
-  <button type="submit">تولید پرامپت طراحی</button>
-</form>
-
-<div id="output"></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-const layout = document.getElementById('layout');
-const wallCSection = document.getElementById('wallCSection');
+let scene, camera, renderer, controls;
+let walls=[], units=[], appliances=[], selectedElement=null;
 
-layout.addEventListener('change', () => {
-  wallCSection.classList.toggle('hidden', layout.value !== 'U شکل');
-});
+initScene();
+renderScene();
+updateWallSelect();
 
-function handleCustom(selectId, inputId) {
-  const select = document.getElementById(selectId);
-  const input = document.getElementById(inputId);
-  select.addEventListener('change', () => {
-    input.classList.toggle('hidden', select.value !== 'custom');
-  });
+function initScene(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 120, 200);
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  const light = new THREE.DirectionalLight(0xffffff,1);
+  light.position.set(100,200,100);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0xffffff,0.5));
 }
 
-handleCustom('fridgeSelect', 'fridgeCustom');
-handleCustom('sinkSelect', 'sinkCustom');
-handleCustom('dishSelect', 'dishCustom');
-handleCustom('washerSelect', 'washerCustom');
-handleCustom('ovenSelect', 'ovenCustom');
+function renderScene(){
+  requestAnimationFrame(renderScene);
+  controls.update();
+  renderer.render(scene, camera);
+}
 
-let elementCount = 0;
-function addElement() {
-  elementCount++;
-  const container = document.getElementById('architecturalElements');
-  const div = document.createElement('div');
-  div.innerHTML = `
-    <fieldset style="margin-top:20px; border:1px solid #ccc; padding:10px;">
-      <legend>عنصر ${elementCount}</legend>
-      <label>دیوار مربوطه:</label>
-      <select name="elementWall${elementCount}">
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-      </select>
+// ---------- مدیریت دیوارها ----------
+function addWall(length=40, height=50, depth=2, angleDeg=0){
+  let geometry = new THREE.BoxGeometry(length, height, depth);
+  let material = new THREE.MeshStandardMaterial({color:0x0077ff});
+  let wall = new THREE.Mesh(geometry, material);
 
-      <label>نوع عنصر:</label>
-      <select name="elementType${elementCount}">
-        <option value="پنجره">پنجره</option>
-        <option value="درب">درب</option>
-        <option value="بالکن">بالکن</option>
-        <option value="لغاز">لغاز</option>
-        <option value="ستون">ستون</option>
-        <option value="شکست دیوار">شکست دیوار</option>
-        <option value="سفارشی">سفارشی</option>
-      </select>
+  let x=0,z=0, rotY=0;
+  if(walls.length>0){
+    let prev = walls[walls.length-1];
+    rotY = prev.rotationY;
+    x = prev.position.x + Math.cos(prev.rotationY)*prev.length;
+    z = prev.position.z + Math.sin(prev.rotationY)*prev.length;
+  }
 
-      <label>
+  wall.position.set(x + length/2, height/2, z);
+  wall.rotation.y = rotY;
+  wall.rotationY = rotY;
+  wall.length = length;
+  scene.add(wall);
+  walls.push(wall);
+  updateWallSelect();
+  updatePrompt();
+}
+
+function updateWallSelect(){
+  const sel = document.getElementById("wallSelect");
+  sel.innerHTML="";
+  walls.forEach((w,i)=>{ sel.innerHTML+=`<option value="${i}">دیوار ${i+1}</option>`; });
+}
+
+// ---------- مدیریت یونیت‌ها ----------
+function addUnit(){
+  if(walls.length===0) return;
+  let width=20, height=30, depth=20;
+  let geometry = new THREE.BoxGeometry(width, height, depth);
+  let material = new THREE.MeshStandardMaterial({color:0xff0000});
+  let unit = new THREE.Mesh(geometry, material);
+
+  let wallIndex = parseInt(document.getElementById("wallSelect").value);
+  let wall = walls[wallIndex];
+  let offset = 0;
+  let localX = -wall.length/2 + offset + width/2;
+  let pos = new THREE.Vector3(localX, height/2, 0);
+  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
+  pos.add(wall.position);
+
+  unit.position.copy(pos);
+  unit.rotation.y = wall.rotationY;
+  scene.add(unit);
+  units.push({mesh:unit, width,height,depth,wallIndex,offset});
+  selectedElement = units[units.length-1];
+  document.getElementById("offsetInput").value = offset;
+  document.getElementById("heightInput").value = height;
+  updatePrompt();
+}
+
+// ---------- مدیریت وسایل ----------
+function addAppliance(){
+  if(walls.length===0) return;
+  let size=15;
+  let geometry = new THREE.BoxGeometry(size,size*2,size);
+  let material = new THREE.MeshStandardMaterial({color:0xffff00});
+  let appliance = new THREE.Mesh(geometry, material);
+
+  let wallIndex = parseInt(document.getElementById("wallSelect").value);
+  let wall = walls[wallIndex];
+  let offset = 0;
+  let localX = -wall.length/2 + offset + size/2;
+  let pos = new THREE.Vector3(localX, size, 0);
+  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
+  pos.add(wall.position);
+
+  appliance.position.copy(pos);
+  appliance.rotation.y = wall.rotationY;
+  scene.add(appliance);
+  appliances.push({mesh:appliance, type:"Fridge", wallIndex, offset});
+  selectedElement = appliances[appliances.length-1];
+  document.getElementById("offsetInput").value = offset;
+  document.getElementById("heightInput").value = size*2;
+  updatePrompt();
+}
+
+// ---------- بروزرسانی موقعیت ----------
+function updatePosition(){
+  if(!selectedElement) return;
+  let offset = parseFloat(document.getElementById("offsetInput").value);
+  let height = parseFloat(document.getElementById("heightInput").value);
+  let wall = walls[selectedElement.wallIndex];
+
+  selectedElement.offset = offset;
+  selectedElement.mesh.position.y = height/2;
+
+  let localX = -wall.length/2 + offset + selectedElement.width/2 || selectedElement.mesh.geometry.parameters.width/2;
+  let pos = new THREE.Vector3(localX, height/2, 0);
+  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
+  pos.add(wall.position);
+  selectedElement.mesh.position.copy(pos);
+
+  updatePrompt();
+}
+
+// ---------- پرامپت خروجی ----------
+function updatePrompt(){
+  let text="Kitchen 3D preview:\n";
+  walls.forEach((w,i)=>{ text+=`Wall ${i+1}: length=${w.length}, rotationY=${THREE.MathUtils.radToDeg(w.rotationY)}°\n`; });
+  units.forEach((u,i)=>{ text+=`Unit ${i+1}: width=${u.width}, height=${u.height}, depth=${u.depth}, Wall=${u.wallIndex+1}, offset=${u.offset}m\n`; });
+  appliances.forEach((a,i)=>{ text+=`Appliance ${i+1}: type=${a.type}, Wall=${a.wallIndex+1}, offset=${a.offset}m\n`; });
+  document.getElementById("output").value=text;
+}
+
+// شروع با یک دیوار، یک یونیت و یک وسیله
+addWall();
+addUnit();
+addAppliance();
+renderScene();
+</script>
+
+</body>
+</html>
