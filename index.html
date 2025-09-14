@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>فرم پویا طراحی کابینت آشپزخانه</title>
+  <title>فرم کامل طراحی کابینت آشپزخانه</title>
   <style>
     body { font-family: sans-serif; direction: rtl; background: #f2f2f2; padding: 20px; }
     label { display: block; margin-top: 10px; }
@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<h2>فرم پویا طراحی کابینت آشپزخانه</h2>
+<h2>فرم کامل طراحی کابینت آشپزخانه</h2>
 
 <form id="cabinetForm">
   <label>نوع چیدمان:</label>
@@ -105,6 +105,11 @@
   </select>
   <input type="text" name="ovenCustom" id="ovenCustom" class="hidden" placeholder="محل دلخواه فر و مایکروفر">
 
+  <hr>
+  <h3>ویژگی‌های معماری دیوارها</h3>
+  <div id="architecturalElements"></div>
+  <button type="button" onclick="addElement()">افزودن عنصر جدید</button>
+
   <button type="submit">تولید پرامپت طراحی</button>
 </form>
 
@@ -132,38 +137,30 @@ handleCustom('dishSelect', 'dishCustom');
 handleCustom('washerSelect', 'washerCustom');
 handleCustom('ovenSelect', 'ovenCustom');
 
-document.getElementById('cabinetForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target));
+let elementCount = 0;
+function addElement() {
+  elementCount++;
+  const container = document.getElementById('architecturalElements');
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <fieldset style="margin-top:20px; border:1px solid #ccc; padding:10px;">
+      <legend>عنصر ${elementCount}</legend>
+      <label>دیوار مربوطه:</label>
+      <select name="elementWall${elementCount}">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
 
-  const fridge = data.fridgePosition === 'custom' ? data.fridgeCustom : data.fridgePosition;
-  const sink = data.sinkPosition === 'custom' ? data.sinkCustom : data.sinkPosition;
-  const dish = data.dishwasherPosition === 'custom' ? data.dishCustom : data.dishwasherPosition;
-  const washer = data.washerPosition === 'custom' ? data.washerCustom : data.washerPosition;
-  const oven = data.ovenPosition === 'custom' ? data.ovenCustom : data.ovenPosition;
+      <label>نوع عنصر:</label>
+      <select name="elementType${elementCount}">
+        <option value="پنجره">پنجره</option>
+        <option value="درب">درب</option>
+        <option value="بالکن">بالکن</option>
+        <option value="لغاز">لغاز</option>
+        <option value="ستون">ستون</option>
+        <option value="شکست دیوار">شکست دیوار</option>
+        <option value="سفارشی">سفارشی</option>
+      </select>
 
-  const wallCText = data.wallC ? `Wall C length: ${data.wallC} cm\n` : '';
-
-  const prompt = `Design a modular kitchen cabinetry system with a ${data.layout} layout.
-Wall A length: ${data.wallA} cm
-Wall B length: ${data.wallB} cm, positioned to the ${data.wallBPosition} of Wall A
-${wallCText}Ceiling height: ${data.ceilingHeight} cm
-Cabinet color: ${data.cabinetColor}, finish: ${data.finish}
-
-Appliance Placement:
-- Fridge: ${fridge}
-- Sink: ${sink}
-- Dishwasher: ${dish}
-- Washing Machine: ${washer}
-- Oven/Microwave: ${oven}
-
-Use high-gloss polyglass panels with push-to-open mechanisms.
-Construct carcass from moisture-resistant MDF with PVC edge banding.
-Ensure clean alignment and functional zoning.`;
-
-  document.getElementById('output').textContent = prompt;
-});
-</script>
-
-</body>
-</html
+      <label>
