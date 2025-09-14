@@ -2,185 +2,235 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>ویرایش تعاملی 3D کابینت</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طراحی آشپزخانه AI حرفه‌ای</title>
 <style>
-  body { margin:0; overflow:hidden; font-family:sans-serif; direction:rtl; }
-  #gui { position:absolute; top:10px; right:10px; background:#fff; padding:10px; border-radius:5px; z-index:1; width:300px; }
-  label { display:block; margin:3px 0; }
-  input, select { width:100%; }
-  textarea { width:100%; height:120px; margin-top:5px; font-family: monospace; }
+body { font-family: Vazir, sans-serif; background: #f5f5f5; margin:0; padding:0; }
+.container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+h2 { text-align: center; color: #333; margin-bottom: 10px; }
+.step { display: none; }
+.step.active { display: block; }
+label { display: block; margin-top: 10px; }
+input, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
+button { margin-top: 20px; padding: 10px 20px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+button:hover { background: #45a049; }
+#progress { margin-bottom: 20px; }
+#progress span { display: inline-block; width: 20%; text-align: center; font-weight: bold; color: #999; }
+#progress span.active { color: #4CAF50; }
+#preview { border:1px solid #ccc; background:#f9f9f9; margin-top:20px; width:100%; height:400px; position: relative; }
+pre { background: #eee; padding: 10px; border-radius: 5px; margin-top: 20px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }
+button.copy-btn { background: #2196F3; margin-right: 10px; }
+button.download-btn { background: #FF5722; }
 </style>
 </head>
 <body>
 
-<div id="gui">
-  <button onclick="addWall()">➕ دیوار</button>
-  <hr>
-  <label>دیوار انتخابی:</label>
-  <select id="wallSelect"></select>
-  <button onclick="addUnit()">➕ یونیت</button>
-  <button onclick="addAppliance()">➕ وسیله</button>
-  <hr>
-  <label>Offset (m):</label>
-  <input type="number" id="offsetInput" step="0.1" value="0">
-  <label>Height (m):</label>
-  <input type="number" id="heightInput" step="0.1" value="0">
-  <button onclick="updatePosition()">بروزرسانی موقعیت</button>
-  <hr>
-  <textarea id="output" readonly></textarea>
+<div class="container">
+<h2>طراحی آشپزخانه AI حرفه‌ای</h2>
+
+<div id="progress">
+<span class="active">1</span>
+<span>2</span>
+<span>3</span>
+<span>4</span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<canvas id="preview"></canvas>
+
+<!-- Step 1 -->
+<div class="step active" id="step1">
+<label>طول آشپزخانه (cm): <input type="number" id="length" min="50"></label>
+<label>عرض آشپزخانه (cm): <input type="number" id="width" min="50"></label>
+<label>ارتفاع سقف (cm): <input type="number" id="height" min="50"></label>
+<label>شکل آشپزخانه:
+<select id="shape">
+<option value="مستطیل">مستطیل</option>
+<option value="L">L</option>
+<option value="U">U</option>
+</select>
+</label>
+<button onclick="nextStep()">بعدی</button>
+</div>
+
+<!-- Step 2 -->
+<div class="step" id="step2">
+<label>Offset دیوارها (cm): <input type="number" id="offset" min="0"></label>
+<label>تعداد درب‌ها: <input type="number" id="doors" min="0"></label>
+<label>لوازم اصلی (Drag & Drop روی پیش‌نمایش):</label>
+<select id="appliances" multiple>
+<option value="یخچال">یخچال</option>
+<option value="اجاق">اجاق</option>
+<option value="سینک">سینک</option>
+</select>
+<button onclick="prevStep()">قبلی</button>
+<button onclick="nextStep()">بعدی</button>
+</div>
+
+<!-- Step 3 -->
+<div class="step" id="step3">
+<label>سبک طراحی:
+<select id="style">
+<option value="مدرن">مدرن</option>
+<option value="کلاسیک">کلاسیک</option>
+<option value="صنعتی">صنعتی</option>
+</select>
+</label>
+<label>جنس کابینت:
+<select id="material">
+<option value="چوب">چوب</option>
+<option value="MDF">MDF</option>
+<option value="هایگلاس">هایگلاس</option>
+</select>
+</label>
+<label>فینیش رنگ: <input type="text" id="finish" placeholder="مثال: براق سفید"></label>
+<button onclick="prevStep()">قبلی</button>
+<button onclick="nextStep()">بعدی</button>
+</div>
+
+<!-- Step 4 -->
+<div class="step" id="step4">
+<label>نورپردازی:
+<select id="lighting">
+<option value="طبیعی">طبیعی</option>
+<option value="مصنوعی">مصنوعی</option>
+<option value="ترکیبی">ترکیبی</option>
+</select>
+</label>
+<label>متریال کف: <input type="text" id="floor" placeholder="مثال: سرامیک خاکستری"></label>
+<label>المان‌های تزئینی: <input type="text" id="decor" placeholder="اختیاری"></label>
+<button onclick="prevStep()">قبلی</button>
+<button onclick="generatePrompt()">تولید پرامپت JSON</button>
+</div>
+
+<pre id="output"></pre>
+<button class="copy-btn" onclick="copyJSON()">کپی JSON</button>
+<button class="download-btn" onclick="downloadJSON()">دانلود JSON</button>
+
+</div>
 
 <script>
-let scene, camera, renderer, controls;
-let walls=[], units=[], appliances=[], selectedElement=null;
-
-initScene();
-renderScene();
-updateWallSelect();
-
-function initScene(){
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf0f0f0);
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 120, 200);
-  renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-
-  const light = new THREE.DirectionalLight(0xffffff,1);
-  light.position.set(100,200,100);
-  scene.add(light);
-  scene.add(new THREE.AmbientLight(0xffffff,0.5));
+// Step navigation
+let currentStep = 1;
+function showStep(step){
+  document.querySelectorAll('.step').forEach((el,i)=>el.classList.remove('active'));
+  document.getElementById('step'+step).classList.add('active');
+  document.querySelectorAll('#progress span').forEach((el,i)=>el.classList.remove('active'));
+  document.querySelectorAll('#progress span')[step-1].classList.add('active');
 }
 
-function renderScene(){
-  requestAnimationFrame(renderScene);
-  controls.update();
-  renderer.render(scene, camera);
-}
+function nextStep(){ if(currentStep<4){ currentStep++; showStep(currentStep); drawPreview(); } }
+function prevStep(){ if(currentStep>1){ currentStep--; showStep(currentStep); drawPreview(); } }
 
-// ---------- مدیریت دیوارها ----------
-function addWall(length=40, height=50, depth=2, angleDeg=0){
-  let geometry = new THREE.BoxGeometry(length, height, depth);
-  let material = new THREE.MeshStandardMaterial({color:0x0077ff});
-  let wall = new THREE.Mesh(geometry, material);
-
-  let x=0,z=0, rotY=0;
-  if(walls.length>0){
-    let prev = walls[walls.length-1];
-    rotY = prev.rotationY;
-    x = prev.position.x + Math.cos(prev.rotationY)*prev.length;
-    z = prev.position.z + Math.sin(prev.rotationY)*prev.length;
+// Load/save form data with LocalStorage
+window.onload = function(){
+  if(localStorage.getItem('kitchenData')){
+    const saved = JSON.parse(localStorage.getItem('kitchenData'));
+    for(const key in saved){
+      const el = document.getElementById(key);
+      if(el){
+        if(el.tagName==='SELECT' && el.multiple){
+          Array.from(el.options).forEach(o=>o.selected = saved[key].includes(o.value));
+        }else{
+          el.value = saved[key];
+        }
+      }
+    }
+    drawPreview();
   }
+};
 
-  wall.position.set(x + length/2, height/2, z);
-  wall.rotation.y = rotY;
-  wall.rotationY = rotY;
-  wall.length = length;
-  scene.add(wall);
-  walls.push(wall);
-  updateWallSelect();
-  updatePrompt();
+function getFormData(){
+  const data = {
+    length: Number(document.getElementById('length').value) || 200,
+    width: Number(document.getElementById('width').value) || 150,
+    height: Number(document.getElementById('height').value) || 250,
+    shape: document.getElementById('shape').value,
+    offset: Number(document.getElementById('offset').value) || 0,
+    doors: Number(document.getElementById('doors').value) || 1,
+    appliances: Array.from(document.getElementById('appliances').selectedOptions).map(o=>o.value),
+    style: document.getElementById('style').value,
+    material: document.getElementById('material').value,
+    finish: document.getElementById('finish').value,
+    lighting: document.getElementById('lighting').value,
+    floor: document.getElementById('floor').value,
+    decor: document.getElementById('decor').value,
+    appliancePositions: appliancePositions
+  };
+  localStorage.setItem('kitchenData', JSON.stringify(data));
+  return data;
 }
 
-function updateWallSelect(){
-  const sel = document.getElementById("wallSelect");
-  sel.innerHTML="";
-  walls.forEach((w,i)=>{ sel.innerHTML+=`<option value="${i}">دیوار ${i+1}</option>`; });
+// Generate JSON prompt
+function generatePrompt(){
+  const data = getFormData();
+  const promptText = `Create a ${data.style} kitchen, dimensions ${data.length}x${data.width}x${data.height} cm, with ${data.material} cabinets, ${data.finish} finish, ${data.lighting} lighting. Include appliances: ${data.appliances.join(', ')}. Offset: ${data.offset} cm, Doors: ${data.doors}. Floor material: ${data.floor}. Decorative elements: ${data.decor}. Ensure ultra-realistic textures and high detail.`;
+  const output = { prompt: promptText, parameters: data };
+  document.getElementById('output').textContent = JSON.stringify(output,null,2);
+  drawPreview();
 }
 
-// ---------- مدیریت یونیت‌ها ----------
-function addUnit(){
-  if(walls.length===0) return;
-  let width=20, height=30, depth=20;
-  let geometry = new THREE.BoxGeometry(width, height, depth);
-  let material = new THREE.MeshStandardMaterial({color:0xff0000});
-  let unit = new THREE.Mesh(geometry, material);
-
-  let wallIndex = parseInt(document.getElementById("wallSelect").value);
-  let wall = walls[wallIndex];
-  let offset = 0;
-  let localX = -wall.length/2 + offset + width/2;
-  let pos = new THREE.Vector3(localX, height/2, 0);
-  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
-  pos.add(wall.position);
-
-  unit.position.copy(pos);
-  unit.rotation.y = wall.rotationY;
-  scene.add(unit);
-  units.push({mesh:unit, width,height,depth,wallIndex,offset});
-  selectedElement = units[units.length-1];
-  document.getElementById("offsetInput").value = offset;
-  document.getElementById("heightInput").value = height;
-  updatePrompt();
+// Copy & Download JSON
+function copyJSON(){ navigator.clipboard.writeText(document.getElementById('output').textContent).then(()=>alert('JSON کپی شد!')); }
+function downloadJSON(){
+  const blob = new Blob([document.getElementById('output').textContent], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='kitchen_prompt.json'; a.click();
+  URL.revokeObjectURL(url);
 }
 
-// ---------- مدیریت وسایل ----------
-function addAppliance(){
-  if(walls.length===0) return;
-  let size=15;
-  let geometry = new THREE.BoxGeometry(size,size*2,size);
-  let material = new THREE.MeshStandardMaterial({color:0xffff00});
-  let appliance = new THREE.Mesh(geometry, material);
+// Canvas preview
+const canvas = document.getElementById('preview');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 
-  let wallIndex = parseInt(document.getElementById("wallSelect").value);
-  let wall = walls[wallIndex];
-  let offset = 0;
-  let localX = -wall.length/2 + offset + size/2;
-  let pos = new THREE.Vector3(localX, size, 0);
-  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
-  pos.add(wall.position);
+// Drag & Drop
+let appliancePositions = {}; // {name:{x,y,width,height}}
+let dragging = null;
+canvas.addEventListener('mousedown', e=>{
+  const mouse = getMousePos(e);
+  for(const name in appliancePositions){
+    const a = appliancePositions[name];
+    if(mouse.x>a.x && mouse.x<a.x+a.width && mouse.y>a.y && mouse.y<a.y+a.height){
+      dragging = name; break;
+    }
+  }
+});
+canvas.addEventListener('mouseup', e=>{ dragging=null; });
+canvas.addEventListener('mousemove', e=>{
+  if(dragging){
+    const mouse = getMousePos(e);
+    appliancePositions[dragging].x = mouse.x - appliancePositions[dragging].width/2;
+    appliancePositions[dragging].y = mouse.y - appliancePositions[dragging].height/2;
+    drawPreview();
+  }
+});
 
-  appliance.position.copy(pos);
-  appliance.rotation.y = wall.rotationY;
-  scene.add(appliance);
-  appliances.push({mesh:appliance, type:"Fridge", wallIndex, offset});
-  selectedElement = appliances[appliances.length-1];
-  document.getElementById("offsetInput").value = offset;
-  document.getElementById("heightInput").value = size*2;
-  updatePrompt();
+function getMousePos(evt){
+  const rect = canvas.getBoundingClientRect();
+  return {x:evt.clientX-rect.left, y:evt.clientY-rect.top};
 }
 
-// ---------- بروزرسانی موقعیت ----------
-function updatePosition(){
-  if(!selectedElement) return;
-  let offset = parseFloat(document.getElementById("offsetInput").value);
-  let height = parseFloat(document.getElementById("heightInput").value);
-  let wall = walls[selectedElement.wallIndex];
+// Draw preview
+function drawPreview(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const data = getFormData();
+  const scaleX = canvas.width/(data.width*1.2);
+  const scaleY = canvas.height/(data.length*1.2);
+  const scale = Math.min(scaleX, scaleY);
 
-  selectedElement.offset = offset;
-  selectedElement.mesh.position.y = height/2;
+  // Draw kitchen floor
+  ctx.fillStyle="#f0f0f0"; ctx.fillRect(10,10,data.width*scale,data.length*scale);
+  ctx.strokeStyle="#333"; ctx.lineWidth=2; ctx.strokeRect(10,10,data.width*scale,data.length*scale);
 
-  let localX = -wall.length/2 + offset + selectedElement.width/2 || selectedElement.mesh.geometry.parameters.width/2;
-  let pos = new THREE.Vector3(localX, height/2, 0);
-  pos.applyAxisAngle(new THREE.Vector3(0,1,0), wall.rotationY);
-  pos.add(wall.position);
-  selectedElement.mesh.position.copy(pos);
-
-  updatePrompt();
+  // Draw appliances
+  data.appliances.forEach((name,i)=>{
+    if(!appliancePositions[name]) appliancePositions[name]={x:15+i*60, y:15, width:50, height:50};
+    const a = appliancePositions[name];
+    ctx.fillStyle="#ff9999"; ctx.fillRect(a.x,a.y,a.width,a.height);
+    ctx.fillStyle="#000"; ctx.font="14px Vazir"; ctx.fillText(name,a.x+2,a.y+a.height+12);
+  });
 }
-
-// ---------- پرامپت خروجی ----------
-function updatePrompt(){
-  let text="Kitchen 3D preview:\n";
-  walls.forEach((w,i)=>{ text+=`Wall ${i+1}: length=${w.length}, rotationY=${THREE.MathUtils.radToDeg(w.rotationY)}°\n`; });
-  units.forEach((u,i)=>{ text+=`Unit ${i+1}: width=${u.width}, height=${u.height}, depth=${u.depth}, Wall=${u.wallIndex+1}, offset=${u.offset}m\n`; });
-  appliances.forEach((a,i)=>{ text+=`Appliance ${i+1}: type=${a.type}, Wall=${a.wallIndex+1}, offset=${a.offset}m\n`; });
-  document.getElementById("output").value=text;
-}
-
-// شروع با یک دیوار، یک یونیت و یک وسیله
-addWall();
-addUnit();
-addAppliance();
-renderScene();
 </script>
-
 </body>
 </html>
